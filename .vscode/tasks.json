@@ -1,0 +1,11 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "shell",
+      "command": "./node_modules/.bin/tsc && node out/slaverr.js",
+      "group": "build",
+      "label": "Run"
+    }
+  ]
+}
