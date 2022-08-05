@@ -6,7 +6,7 @@ import path from "path";
 console.log("Starting Slaverr");
 console.log(
   "Invite URL:",
-  "https://discord.com/api/oauth2/authorize?client_id=1004826870816190615&permissions=3072&scope=bot"
+  `https://discord.com/api/oauth2/authorize?client_id=${process.env.DC_CLIENT_ID}&permissions=3072&scope=bot`
 );
 
 if (!process.env.DC_TOKEN) {
