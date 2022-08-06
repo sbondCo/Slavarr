@@ -63,7 +63,7 @@ export async function addContent(api: API, interaction: ButtonInteraction, args:
           { name: "Year", value: `${content.year}`, inline: true },
           { name: "IMDb", value: `[Link](https://www.imdb.com/title/${content.imdbId})`, inline: true },
 
-          api.type === "radarr"
+          api.type === "sonarr"
             ? { name: "TVDB", value: `[Link](https://thetvdb.com/?tab=series&id=${content.tvdbId})`, inline: true }
             : { name: "TMDB", value: `[Link](https://www.themoviedb.org/movie/${content.tmdbId})`, inline: true },
 
