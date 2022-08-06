@@ -2,10 +2,9 @@
  * Run to register / update slash commands.
  */
 
-const { Routes } = require("discord.js");
+const { Routes, SlashCommandBuilder } = require("discord.js");
 const { REST } = require("@discordjs/rest");
-const fs = require("fs");
-const path = require("path");
+const { default: axios } = require("axios");
 require("dotenv").config();
 
 if (!process.env.DC_CLIENT_ID) {
@@ -13,16 +12,32 @@ if (!process.env.DC_CLIENT_ID) {
   process.exit(1);
 }
 
-const commands = [];
-const commandsDir = path.join(__dirname, "out", "commands");
-for (const file of fs.readdirSync(commandsDir).filter((file) => file.endsWith(".js"))) {
-  const command = require(path.join(commandsDir, file));
-  commands.push(command.data.toJSON());
-}
-
-const rest = new REST({ version: "10" }).setToken(process.env.DC_TOKEN);
-
 (async () => {
+  const { data: radarrQualities } = await axios.get(
+    `${process.env.RADARR_URL}/qualityprofile/?apikey=${process.env.RADARR_KEY}`
+  );
+
+  const commands = [
+    // Movie command
+    new SlashCommandBuilder()
+      .setName("movie")
+      .setDescription("Add a movie to Radarr")
+      .addStringOption((option) => option.setName("name").setDescription("Movie title.").setRequired(true))
+      .addStringOption((option) =>
+        option
+          .setName("quality")
+          .setDescription("Quality profile to use for fetching movie.")
+          .addChoices(
+            ...radarrQualities.map((q) => {
+              return { name: q.name, value: `${q.id}` };
+            })
+          )
+          .setRequired(true)
+      )
+  ];
+
+  const rest = new REST({ version: "10" }).setToken(process.env.DC_TOKEN);
+
   try {
     console.log("Started refreshing application (/) commands.");
 

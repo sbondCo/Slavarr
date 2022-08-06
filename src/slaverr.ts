@@ -27,7 +27,7 @@ const commandFiles = fs.readdirSync(commandsPath).filter((file) => file.endsWith
 for (const file of commandFiles) {
   const filePath = path.join(commandsPath, file);
   const command = require(filePath);
-  commands.set(command.data.name, command);
+  commands.set(path.basename(filePath).replace(path.extname(filePath), ""), command);
 }
 
 client.once("ready", () => {
@@ -35,16 +35,22 @@ client.once("ready", () => {
 });
 
 client.on("interactionCreate", async (interaction) => {
-  if (!interaction.isChatInputCommand()) return;
-
-  const command = commands.get(interaction.commandName);
-
-  if (!command) return;
-
   try {
-    await command.run(interaction);
+    console.log("isButton:", interaction.isButton());
+    if (interaction.isChatInputCommand()) {
+      const command = commands.get(interaction.commandName);
+      if (!command) return;
+      await command.run(interaction);
+    } else if (interaction.isButton() && interaction.customId) {
+      const scid = interaction.customId.split(":");
+      const command = commands.get(scid[0]);
+      if (!command) return;
+      await command.button(interaction, scid.splice(1));
+    } else {
+      console.log("Unsupported interaction type encountered.");
+    }
   } catch (error) {
     console.error(error);
-    await interaction.reply({ content: "Error encountered performing request ;--(", ephemeral: true });
+    // await interaction.reply({ content: "Error encountered performing request ;--(", ephemeral: true });
   }
 });
