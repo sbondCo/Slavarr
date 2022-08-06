@@ -13,9 +13,14 @@ if (!process.env.DC_CLIENT_ID) {
 }
 
 (async () => {
+  console.log("Requesting quality profiles from Radarr and Sonarr.");
   const { data: radarrQualities } = await axios.get(
     `${process.env.RADARR_URL}/qualityprofile/?apikey=${process.env.RADARR_KEY}`
   );
+  const { data: sonarrQualities } = await axios.get(
+    `${process.env.SONARR_URL}/profile/?apikey=${process.env.SONARR_KEY}`
+  );
+  console.log("Done fetching quality profiles.");
 
   const commands = [
     // Movie command
@@ -29,6 +34,23 @@ if (!process.env.DC_CLIENT_ID) {
           .setDescription("Quality profile to use for fetching movie.")
           .addChoices(
             ...radarrQualities.map((q) => {
+              return { name: q.name, value: `${q.id}` };
+            })
+          )
+          .setRequired(true)
+      ),
+
+    // Series command
+    new SlashCommandBuilder()
+      .setName("series")
+      .setDescription("Add a series to Sonarr")
+      .addStringOption((option) => option.setName("name").setDescription("Series title.").setRequired(true))
+      .addStringOption((option) =>
+        option
+          .setName("quality")
+          .setDescription("Quality profile to use for fetching movie.")
+          .addChoices(
+            ...sonarrQualities.map((q) => {
               return { name: q.name, value: `${q.id}` };
             })
           )
