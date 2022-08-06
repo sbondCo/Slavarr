@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from "axios";
 import path from "path";
 
 export default class API {
-  private type: "radarr" | "sonarr";
+  public readonly type: "radarr" | "sonarr";
   private base: string; // API base url
   private key: string; // API key
 

@@ -1,4 +1,18 @@
-export function makeATable(rows: string[][]) {
+export function makeATable(content: any[]) {
+  // Create `rows` array to be used in table later.
+  // First el in array is the headers, rest will be content.
+  const rows = [];
+  rows.push(["ID", "Name", "Year"]);
+
+  for (const _k in content) {
+    if (Object.prototype.hasOwnProperty.call(content, _k)) {
+      const k = Number(_k);
+
+      const show = content[k];
+      rows.push([k, show.title, show.year]);
+    }
+  }
+
   let table = [];
   let longest = [0, 0, 0];
 
