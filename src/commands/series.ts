@@ -1,3 +1,88 @@
-export function run() {}
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonInteraction,
+  ButtonStyle,
+  ChatInputCommandInteraction,
+  EmbedBuilder
+} from "discord.js";
+import { NUMBER_EMOJIS } from "../consts";
+import { makeATable } from "../lib/helpMe";
+import API from "../lib/api";
 
-export function button() {}
+const api = new API("sonarr");
+
+export async function run(interaction: ChatInputCommandInteraction) {
+  const name = interaction.options.getString("name");
+  const quality = interaction.options.getString("quality");
+
+  if (!name || !quality) {
+    console.error("Attempted to run series command without name or quality args.");
+    console.error("----> name:", name, "quality id:", quality);
+    return;
+  }
+
+  const series = (await api.search(name)).splice(0, 5);
+  const buttons = [];
+
+  if (!series || series.length <= 0) {
+    interaction.reply(`Couldn't find any series matching ${name}`);
+    return;
+  }
+
+  // Create `rows` array to be used in table later.
+  // First el in array is the headers, rest will be content.
+  const rows = [];
+  rows.push(["ID", "Name", "Year"]);
+
+  for (const _k in series) {
+    if (Object.prototype.hasOwnProperty.call(series, _k)) {
+      const k = Number(_k);
+
+      const show = series[k];
+      rows.push([k, show.title, show.year]);
+
+      buttons.push(
+        new ButtonBuilder()
+          .setCustomId(`series:${show.imdbId}:${quality}`)
+          .setEmoji(`${NUMBER_EMOJIS[k]}`)
+          .setStyle(k == 0 ? ButtonStyle.Primary : ButtonStyle.Secondary)
+      );
+    }
+  }
+
+  const table = makeATable(rows);
+
+  interaction.reply({
+    content: "```" + table + "```",
+    components: [new ActionRowBuilder<ButtonBuilder>().addComponents(...buttons)]
+  });
+}
+
+export async function button(interaction: ButtonInteraction, args: string[]) {
+  const { 0: imdbId, 1: qualityId } = args;
+  console.log("button reached", imdbId, qualityId);
+
+  if (!imdbId || !qualityId) return;
+
+  const series = await api.add(imdbId, qualityId);
+
+  interaction.message.edit({
+    embeds: [
+      new EmbedBuilder()
+        .setTitle(`${series.title}`)
+        .addFields(
+          { name: "Year", value: `${series.year}`, inline: true },
+          { name: "IMDb", value: `[Link](https://www.imdb.com/title/${series.imdbId})`, inline: true },
+          { name: "TVDB", value: `[Link](https://thetvdb.com/?tab=series&id=${series.tvdbId})`, inline: true },
+          { name: "Genres", value: `${series.genres.join(", ")}`, inline: false }
+          // { name: "Overview", value: `${series.overview.slice(0, 100)}...`, inline: false }
+        )
+        .setImage(series.images[0].remoteUrl)
+        .setTimestamp()
+        .setFooter({ text: "Search started" })
+    ],
+    content: "",
+    components: [] // Empty arr to remove existing buttons
+  });
+}
