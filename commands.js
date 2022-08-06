@@ -31,7 +31,7 @@ if (!process.env.DC_CLIENT_ID) {
       .addStringOption((option) =>
         option
           .setName("quality")
-          .setDescription("Quality profile to use for fetching movie.")
+          .setDescription("Quality profile to use for fetching the movie.")
           .addChoices(
             ...radarrQualities.map((q) => {
               return { name: q.name, value: `${q.id}` };
@@ -48,7 +48,7 @@ if (!process.env.DC_CLIENT_ID) {
       .addStringOption((option) =>
         option
           .setName("quality")
-          .setDescription("Quality profile to use for fetching movie.")
+          .setDescription("Quality profile to use for fetching the show.")
           .addChoices(
             ...sonarrQualities.map((q) => {
               return { name: q.name, value: `${q.id}` };
