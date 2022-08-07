@@ -54,6 +54,10 @@ export async function addContent(api: API, interaction: ButtonInteraction, args:
   if (!imdbId || !qualityId) return;
 
   const content = await api.add(imdbId, qualityId);
+  let poster = content.images.find((e: any) => e.coverType === "poster")?.remoteUrl;
+  if (!poster && content?.images && content.images[0]?.remoteUrl) {
+    poster = content.images[0]?.remoteUrl;
+  }
 
   interaction.message.edit({
     embeds: [
@@ -70,7 +74,7 @@ export async function addContent(api: API, interaction: ButtonInteraction, args:
           { name: "Genres", value: `${content.genres.join(", ")}`, inline: false }
           // { name: "Overview", value: `${content.overview.slice(0, 100)}...`, inline: false }
         )
-        .setImage(content.images[0].remoteUrl)
+        .setImage(poster)
         .setTimestamp()
         .setFooter({ text: "Search started" })
     ],
