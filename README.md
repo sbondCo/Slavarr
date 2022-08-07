@@ -22,15 +22,17 @@ The Discord bot to help you easily add movies/series to Radarr/Sonarr.
 
 1. Download/clone the code from the [repo](https://github.com/IRHM/Slavarr).
 2. Copy the `.env.example` files contents into a new file `.env` and fill out all the environment variables listed.
-3. Run:
-    ```
-    # Install packages needed for production
-    npm ci --only=production
-    # Build slavarr
-    npm run build
-    # Register the bots commands with discord
-    node commands.js
-    # Start slavarr
-    npm run start
-    ```
+3. Build and register bot slash commands:
+   ```
+   # Install packages needed for production
+   npm ci --only=production
+   # Build slavarr
+   npm run build
+   # Register the bots commands with discord
+   npm run commands
+   ```
+4. Start the bot
+   ```
+   npm run start
+   ```
 
