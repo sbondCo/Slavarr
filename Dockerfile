@@ -48,6 +48,4 @@ RUN npm ci --only=production
 # Doesn't work when included in copy above...
 COPY --chown=app:app --from=builder /build/out ./out
 
-EXPOSE 3000
-
 CMD [ "npm", "run", "start" ]
