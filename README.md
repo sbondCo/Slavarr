@@ -24,10 +24,13 @@ The Discord bot to help you easily add movies/series to Radarr/Sonarr.
 2. Copy the `.env.example` files contents into a new file `.env` and fill out all the environment variables listed.
 3. Run:
     ```
-    # Only have to install packages/build once (and everytime you download updates from the repo)
+    # Install packages needed for production
     npm ci --only=production
+    # Build slavarr
     npm run build
-
+    # Register the bots commands with discord
+    node commands.js
+    # Start slavarr
     npm run start
     ```
 
