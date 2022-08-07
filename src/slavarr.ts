@@ -3,7 +3,18 @@ import "dotenv/config";
 import fs from "fs";
 import path from "path";
 
-console.log("Starting Slaverr");
+// import API from "./lib/api";
+
+// (async () => {
+//   const api = new API("radarr");
+
+//   // console.log("Add:", await api.getRootFolder());
+//   // console.log("tv:", await api.add("tt2802850", 8));
+//   console.log("mov:", await api.add("tt1340138", 7));
+//   // console.log("Add:", await api.search("terminator"));
+// })();
+
+console.log("Starting Slavarr");
 console.log(
   "Invite URL:",
   `https://discord.com/api/oauth2/authorize?client_id=${process.env.DC_CLIENT_ID}&permissions=3072&scope=bot`

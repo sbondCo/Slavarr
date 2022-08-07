@@ -1,5 +1,5 @@
 {
-  "name": "slaverr",
+  "name": "slavarr",
   "version": "0.1.0",
   "description": "Discord bot to add movies/series using radarr/sonarr",
   "main": "index.js",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "github.com/IRHM/slaverr"
+    "url": "github.com/IRHM/slavarr"
   },
   "author": "IRHM",
   "license": "ISC",

@@ -3,7 +3,7 @@
   "tasks": [
     {
       "type": "shell",
-      "command": "./node_modules/.bin/tsc && node out/slaverr.js",
+      "command": "./node_modules/.bin/tsc && node out/slavarr.js",
       "group": "build",
       "label": "Run"
     }
