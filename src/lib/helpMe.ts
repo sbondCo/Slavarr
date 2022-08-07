@@ -1,3 +1,5 @@
+import { Interaction } from "discord.js";
+
 export function makeATable(content: any[]) {
   // Create `rows` array to be used in table later.
   // First el in array is the headers, rest will be content.
@@ -48,4 +50,19 @@ export function makeATable(content: any[]) {
   }
 
   return tbl;
+}
+
+/**
+ * Gets user's id from interaction and matches it against the bot whitelist.
+ * @param interaction Interaction.
+ * @returns If users id is in whitelist, returns false, otherwise returns true.
+ */
+export function stopAbuse(interaction: Interaction): boolean {
+  const whitelist = process.env.BOT_WHITELIST!.replaceAll(" ", "").split(",");
+
+  if (!interaction.member?.user.id) return true;
+
+  if (whitelist?.includes(interaction.member?.user.id)) return false;
+
+  return true;
 }

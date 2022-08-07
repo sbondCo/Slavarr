@@ -2,17 +2,7 @@ import { Client, Collection } from "discord.js";
 import "dotenv/config";
 import fs from "fs";
 import path from "path";
-
-// import API from "./lib/api";
-
-// (async () => {
-//   const api = new API("radarr");
-
-//   // console.log("Add:", await api.getRootFolder());
-//   // console.log("tv:", await api.add("tt2802850", 8));
-//   console.log("mov:", await api.add("tt1340138", 7));
-//   // console.log("Add:", await api.search("terminator"));
-// })();
+import { stopAbuse } from "./lib/helpMe";
 
 console.log("Starting Slavarr");
 console.log(
@@ -47,6 +37,17 @@ client.once("ready", () => {
 
 client.on("interactionCreate", async (interaction) => {
   try {
+    if (stopAbuse(interaction)) {
+      console.log(
+        "Non whitelisted user attempted to interact:",
+        interaction.member?.user?.username,
+        interaction.member?.user?.id
+      );
+      if (interaction.isRepliable())
+        interaction.reply({ content: "You must be whitelisted to use this function.", ephemeral: true });
+      return;
+    }
+
     console.log("isButton:", interaction.isButton());
     if (interaction.isChatInputCommand()) {
       const command = commands.get(interaction.commandName);
