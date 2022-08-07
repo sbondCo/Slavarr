@@ -31,7 +31,7 @@ The Discord bot to help you easily add movies/series to Radarr/Sonarr.
    # Register the bots commands with discord
    npm run commands
    ```
-4. Start the bot
+4. Start the bot:
    ```
    npm run start
    ```
