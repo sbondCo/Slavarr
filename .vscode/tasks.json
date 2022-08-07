@@ -3,7 +3,7 @@
   "tasks": [
     {
       "type": "shell",
-      "command": "./node_modules/.bin/tsc && node out/slavarr.js",
+      "command": "npm run start:dev",
       "group": "build",
       "label": "Run"
     }

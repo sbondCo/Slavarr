@@ -4,7 +4,9 @@
   "description": "Discord bot to add movies/series using radarr/sonarr",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start:dev": "tsc && node out/slavarr.js",
+    "build": "tsc",
+    "start": "node out/slavarr.js"
   },
   "repository": {
     "type": "git",
