@@ -5,10 +5,20 @@
 const { Routes, SlashCommandBuilder } = require("discord.js");
 const { REST } = require("@discordjs/rest");
 const { default: axios } = require("axios");
-require("dotenv").config();
+require("dotenv").config({ path: ".env" });
 
-if (!process.env.DC_CLIENT_ID) {
-  console.log("Missing DC_CLIENT_ID");
+if (
+  !process.env.DC_TOKEN ||
+  !process.env.DC_CLIENT_ID ||
+  !process.env.RADARR_URL ||
+  !process.env.RADARR_KEY ||
+  !process.env.SONARR_URL ||
+  !process.env.SONARR_KEY
+) {
+  console.log("You are missing a required environment variable!");
+  console.log(
+    "---> Ensure you have all of the following defined in your .env file: DC_TOKEN, DC_CLIENT_ID, RADARR_URL, RADARR_KEY, SONARR_URL, SONARR_KEY"
+  );
   process.exit(1);
 }
 
