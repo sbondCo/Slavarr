@@ -36,7 +36,7 @@ export default class API {
 
   public async search(term: string): Promise<any[]> {
     const res = await this.request("get", this.type === "radarr" ? "movie/lookup" : "series/lookup", { term: term });
-    console.log("search", term, res.status, res.data);
+    console.log("search", term, res.status);
     if (res.status === 200) {
       if (res.data.length <= 0) throw new APIError("Couldn't find any content from search.");
       return res.data;

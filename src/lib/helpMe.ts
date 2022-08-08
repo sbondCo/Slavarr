@@ -1,20 +1,11 @@
 import { Interaction } from "discord.js";
 
-export function makeATable(content: any[]) {
-  // Create `rows` array to be used in table later.
-  // First el in array is the headers, rest will be content.
-  const rows = [];
-  rows.push(["ID", "Name", "Year"]);
-
-  for (const _k in content) {
-    if (Object.prototype.hasOwnProperty.call(content, _k)) {
-      const k = Number(_k);
-
-      const show = content[k];
-      rows.push([k, show.title, show.year]);
-    }
-  }
-
+/**
+ * Make a table from 2d array of rows.
+ * @param rows 2d array of rows to display - first entry in array should be header names.
+ * @returns An ascii table.
+ */
+export function makeATable(rows: string[][]) {
   let table = [];
   let longest = [0, 0, 0];
 

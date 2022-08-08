@@ -29,9 +29,13 @@ export async function listContent(api: API, interaction: ChatInputCommandInterac
       return;
     }
 
+    const rows: string[][] = [];
+    rows.push(["ID", "Name", "Year"]);
+
     for (const _k in content) {
       const k = Number(_k);
       const show = content[k];
+      rows.push([k, show.title, show.year]);
       buttons.push(
         new ButtonBuilder()
           .setCustomId(`${api.type === "radarr" ? "movie" : "series"}:${show.imdbId}:${quality}`)
@@ -40,7 +44,7 @@ export async function listContent(api: API, interaction: ChatInputCommandInterac
       );
     }
 
-    const table = makeATable(content);
+    const table = makeATable(rows);
 
     interaction.reply({
       content: "```\n" + table + "\n```",
