@@ -42,10 +42,22 @@ export function makeATable(content: any[]) {
   let tbl = "";
   for (let i = 0; i < table.length; i++) {
     const row = table[i];
-    const rowCont = row.join(" | ");
-    tbl += rowCont;
-    tbl += "\n";
-    tbl += "".padEnd(rowCont.length, "-");
+    const rowContent = `| ${row.join(" | ")} |`;
+    const rowSeperator = "+" + "".padEnd(rowContent.length - 2, "-") + "+";
+
+    if (i === 0) {
+      tbl += rowSeperator;
+      tbl += "\n";
+      tbl += rowContent;
+      tbl += "\n";
+      tbl += rowSeperator;
+    } else if (i + 1 === table.length) {
+      tbl += rowContent;
+      tbl += "\n";
+      tbl += rowSeperator;
+    } else {
+      tbl += rowContent;
+    }
     tbl += "\n";
   }
 

@@ -43,7 +43,7 @@ export async function listContent(api: API, interaction: ChatInputCommandInterac
     const table = makeATable(content);
 
     interaction.reply({
-      content: "```" + table + "```",
+      content: "```\n" + table + "\n```",
       components: [new ActionRowBuilder<ButtonBuilder>().addComponents(...buttons)]
     });
   } catch (err) {
