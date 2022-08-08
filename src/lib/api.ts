@@ -23,6 +23,19 @@ export default class API {
     throw new Error(`Error getting quality profiles:` + res.status + res.data);
   }
 
+  public async getLanguages() {
+    if (this.type === "radarr") throw new Error("Error fetching language profiles: Radarr not supported.");
+
+    const res = await this.request("get", "languageprofile");
+    console.log("getLanguages", res.status, res.data);
+    if (res.status === 200) {
+      if (res.data.length <= 0) throw new APIError(`Was unable to fetch language profiles ${this.type}`);
+      return res.data;
+    }
+
+    throw new Error(`Error getting root folder:` + res.status + res.data);
+  }
+
   public async getRootFolder() {
     const res = await this.request("get", "rootfolder");
     console.log("getRootFolder", res.status, res.data);
@@ -36,7 +49,7 @@ export default class API {
 
   public async search(term: string): Promise<any[]> {
     const res = await this.request("get", this.type === "radarr" ? "movie/lookup" : "series/lookup", { term: term });
-    console.log("search", term, res.status);
+    console.log("search", term, res.status, res.config);
     if (res.status === 200) {
       if (res.data.length <= 0) throw new APIError("Couldn't find any content from search.");
       return res.data;
@@ -50,6 +63,10 @@ export default class API {
       0: content // we are returned an array, just get first movie/series from it, since we know there will only be one
     } = await this.search(`imdb:${imdbId}`);
 
+    console.log("content", content);
+    console.log("content folder", content.folder);
+    if (!content.folder || !content.title) throw new APIError("Content search didn't return all info required.");
+
     const {
       0: folder // cba bro we only gonna get first root folder showing up
     } = await this.getRootFolder();
@@ -57,26 +74,40 @@ export default class API {
     const reqData = {
       ...content,
       path: path.join(String(folder.path), String(content.folder)),
-      qualityProfileId: Number(qualityId),
-      monitored: true
+      qualityProfileId: Number(qualityId)
     };
 
+    console.log("radarr monitor", process.env.RADARR_MONITOR);
+    console.log("sonarr monitor", process.env.SONARR_MONITOR);
+
+    // return {} as any;
+
     if (this.type === "radarr") {
+      const toMonitor = process.env.RADARR_MONITOR == "true" ? true : false;
+      reqData.monitored = toMonitor;
       reqData.addOptions = {
-        searchForMovie: false
+        searchForMovie: toMonitor
       };
     } else if (this.type === "sonarr") {
+      const {
+        0: language // just get first language for now.
+      } = await this.getLanguages();
+
+      reqData.languageProfileId = language.id;
       reqData.addOptions = {
-        monitor: "all",
-        searchForMissingEpisodes: false
+        monitor: process.env.SONARR_MONITOR,
+        ignoreEpisodesWithFiles: true,
+        searchForMissingEpisodes: process.env.SONARR_MONITOR ? true : false
       };
     }
+
+    console.log("add request:", reqData);
 
     const res = await this.request("post", this.type === "radarr" ? "movie" : "series", undefined, reqData);
     if (res.status === 201) {
       return res.data;
     }
-    throw new Error(`Error searching for content on ${this.type}:` + res.status + res.data);
+    throw new Error(`Error adding content on ${this.type}:` + res.status + res.data);
   }
 
   private async request(
