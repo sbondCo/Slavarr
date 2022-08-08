@@ -1,6 +1,6 @@
 {
   "name": "slavarr",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Discord bot to add movies/series using radarr/sonarr",
   "main": "index.js",
   "scripts": {
