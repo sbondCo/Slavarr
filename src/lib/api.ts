@@ -27,6 +27,7 @@ export default class API {
     const res = await this.request("get", "rootfolder");
     console.log("getRootFolder", res.status, res.data);
     if (res.status === 200) {
+      if (res.data.length <= 0) throw new APIError(`Was unable to fetch root folder configuration from ${this.type}`);
       return res.data;
     }
 
@@ -37,7 +38,7 @@ export default class API {
     const res = await this.request("get", this.type === "radarr" ? "movie/lookup" : "series/lookup", { term: term });
     console.log("search", term, res.status, res.data);
     if (res.status === 200) {
-      if (res.data.length <= 0) throw new Error("Couldn't find any content from search.");
+      if (res.data.length <= 0) throw new APIError("Couldn't find any content from search.");
       return res.data;
     }
 
@@ -99,5 +100,15 @@ export default class API {
     }
 
     throw new Error("Unsupported `type` arg passed.");
+  }
+}
+
+/**
+ * If we encounter an APIError, we know we can display the
+ * error message to the user, since we must have thrown it.
+ */
+export class APIError extends Error {
+  constructor(message: string) {
+    super(message);
   }
 }

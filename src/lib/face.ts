@@ -7,7 +7,7 @@ import {
   EmbedBuilder
 } from "discord.js";
 import { NUMBER_EMOJIS } from "../consts";
-import API from "./api";
+import API, { APIError } from "./api";
 import { makeATable } from "./helpMe";
 
 export async function listContent(api: API, interaction: ChatInputCommandInteraction) {
@@ -25,7 +25,7 @@ export async function listContent(api: API, interaction: ChatInputCommandInterac
     const buttons = [];
 
     if (!content || content.length <= 0) {
-      interaction.reply(`Couldn't find any content matching ${name}`);
+      interaction.reply({ content: `Couldn't find any content matching **${name}**`, ephemeral: true });
       return;
     }
 
@@ -47,8 +47,12 @@ export async function listContent(api: API, interaction: ChatInputCommandInterac
       components: [new ActionRowBuilder<ButtonBuilder>().addComponents(...buttons)]
     });
   } catch (err) {
-    console.error("Encountered an error trying to listContent:", err);
-    interaction.reply({ content: "Errored whilst attempting to list searched content.", ephemeral: true });
+    if (err instanceof APIError) {
+      interaction.reply({ content: err.message, ephemeral: true });
+    } else {
+      console.error("Encountered standard error trying to listContent:", err);
+      interaction.reply({ content: "Errored whilst attempting to list searched content.", ephemeral: true });
+    }
   }
 }
 
@@ -88,11 +92,16 @@ export async function addContent(api: API, interaction: ButtonInteraction, args:
       components: [] // Empty arr to remove existing buttons
     });
   } catch (err) {
-    console.error("Encountered an error trying to addContent:", err);
     interaction.message.edit({ components: [] });
-    interaction.reply({
-      content: "Errored whilst adding the selected content. Try running your command again plos.",
-      ephemeral: true
-    });
+
+    if (err instanceof APIError) {
+      interaction.reply({ content: err.message, ephemeral: true });
+    } else {
+      console.error("Encountered standard error trying to addContent:", err);
+      interaction.reply({
+        content: "Errored whilst adding the selected content. Try running your command again plos.",
+        ephemeral: true
+      });
+    }
   }
 }
