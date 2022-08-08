@@ -7,7 +7,7 @@ import { stopAbuse } from "./lib/helpMe";
 console.log("Starting Slavarr");
 console.log(
   "Invite URL:",
-  `https://discord.com/api/oauth2/authorize?client_id=${process.env.DC_CLIENT_ID}&permissions=3072&scope=bot`
+  `https://discord.com/api/oauth2/authorize?client_id=${process.env.DC_CLIENT_ID}&permissions=2147485696&scope=bot`
 );
 
 if (!process.env.DC_TOKEN) {
