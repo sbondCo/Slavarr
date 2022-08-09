@@ -1,4 +1,4 @@
-import { ButtonInteraction, ChatInputCommandInteraction } from "discord.js";
+import { ChatInputCommandInteraction, SelectMenuInteraction } from "discord.js";
 import { addContent, listContent } from "../lib/face";
 import API from "../lib/api";
 
@@ -8,6 +8,6 @@ export async function run(interaction: ChatInputCommandInteraction) {
   listContent(api, interaction);
 }
 
-export async function button(interaction: ButtonInteraction, args: string[]) {
+export async function button(interaction: SelectMenuInteraction, args: string[]) {
   addContent(api, interaction, args);
 }

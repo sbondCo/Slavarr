@@ -16,7 +16,7 @@ if (!process.env.DC_TOKEN) {
 }
 
 const client = new Client({
-  intents: ["Guilds", "GuildMessages", "DirectMessages"]
+  intents: ["Guilds", "GuildMessages"]
 });
 
 client.login(process.env.DC_TOKEN);
@@ -48,12 +48,12 @@ client.on("interactionCreate", async (interaction) => {
       return;
     }
 
-    console.log("isButton:", interaction.isButton());
+    console.log("isSelectMenu:", interaction.isSelectMenu());
     if (interaction.isChatInputCommand()) {
       const command = commands.get(interaction.commandName);
       if (!command) return;
       await command.run(interaction);
-    } else if (interaction.isButton() && interaction.customId) {
+    } else if (interaction.isSelectMenu() && interaction.customId) {
       const scid = interaction.customId.split(":");
       const command = commands.get(scid[0]);
       if (!command) return;

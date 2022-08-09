@@ -1,12 +1,11 @@
 import {
   ActionRowBuilder,
-  ButtonBuilder,
-  ButtonInteraction,
-  ButtonStyle,
+  APISelectMenuOption,
   ChatInputCommandInteraction,
-  EmbedBuilder
+  EmbedBuilder,
+  SelectMenuBuilder,
+  SelectMenuInteraction
 } from "discord.js";
-import { NUMBER_EMOJIS } from "../consts";
 import API, { APIError } from "./api";
 import { makeATable } from "./helpMe";
 
@@ -21,8 +20,8 @@ export async function listContent(api: API, interaction: ChatInputCommandInterac
       return;
     }
 
-    const content = (await api.search(name)).splice(0, 5);
-    const buttons = [];
+    const content = (await api.search(name)).splice(0, Number(process.env.BOT_MAX_CONTENT));
+    const options: Array<APISelectMenuOption> = [];
 
     if (!content || content.length <= 0) {
       interaction.reply({ content: `Couldn't find any content matching **${name}**`, ephemeral: true });
@@ -30,25 +29,35 @@ export async function listContent(api: API, interaction: ChatInputCommandInterac
     }
 
     const rows: string[][] = [];
-    rows.push(["ID", "Name", "Year"]);
+    rows.push(["Name", "Year"]);
 
     for (const _k in content) {
       const k = Number(_k);
       const show = content[k];
-      rows.push([k, show.title, show.year]);
-      buttons.push(
-        new ButtonBuilder()
-          .setCustomId(`${api.type === "radarr" ? "movie" : "series"}:${show.imdbId}:${quality}`)
-          .setEmoji(`${NUMBER_EMOJIS[k]}`)
-          .setStyle(k == 0 ? ButtonStyle.Primary : ButtonStyle.Secondary)
-      );
+      console.log("ratings", show.ratings);
+      rows.push([show.title, show.year]);
+      options.push({
+        label: show.title,
+        description: show.overview.slice(0, 100),
+        value: `${show.imdbId}`
+      });
     }
 
     const table = makeATable(rows);
 
     interaction.reply({
-      content: "```\n" + table + "\n```",
-      components: [new ActionRowBuilder<ButtonBuilder>().addComponents(...buttons)]
+      content: "```CSS\n" + table + "\n```",
+      components: [
+        new ActionRowBuilder<SelectMenuBuilder>().addComponents(
+          new SelectMenuBuilder()
+            .setCustomId(`${api.type === "radarr" ? "movie" : "series"}:${quality}`)
+            .setPlaceholder("Select the content to download...")
+            .addOptions(options)
+          // Going to leave it as single select menu for now
+          // .setMinValues(1)
+          // .setMaxValues(content.length)
+        )
+      ]
     });
   } catch (err) {
     if (err instanceof APIError) {
@@ -60,10 +69,12 @@ export async function listContent(api: API, interaction: ChatInputCommandInterac
   }
 }
 
-export async function addContent(api: API, interaction: ButtonInteraction, args: string[]) {
+export async function addContent(api: API, interaction: SelectMenuInteraction, args: string[]) {
   try {
-    const { 0: imdbId, 1: qualityId } = args;
-    console.log("button reached", imdbId, qualityId);
+    const { 0: qualityId } = args;
+    const imdbId = interaction.values[0];
+
+    console.log("addContent", imdbId, qualityId);
 
     if (!imdbId || !qualityId) return;
 
