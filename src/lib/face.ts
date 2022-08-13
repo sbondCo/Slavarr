@@ -38,10 +38,12 @@ export async function listContent(api: API, interaction: ChatInputCommandInterac
       rows.push([show.title, show.year]);
       options.push({
         label: show.title,
-        description: show.overview.slice(0, 100),
+        description: show.overview ? show.overview.slice(0, 100) : "Overview unavailable",
         value: `${show.imdbId}`
       });
     }
+
+    console.log("Select Options", options);
 
     const table = makeATable(rows);
 
@@ -96,8 +98,11 @@ export async function addContent(api: API, interaction: SelectMenuInteraction, a
               ? { name: "TVDB", value: `[Link](https://thetvdb.com/?tab=series&id=${content.tvdbId})`, inline: true }
               : { name: "TMDB", value: `[Link](https://www.themoviedb.org/movie/${content.tmdbId})`, inline: true },
 
-            { name: "Genres", value: `${content.genres.join(", ")}`, inline: false }
-            // { name: "Overview", value: `${content.overview.slice(0, 100)}...`, inline: false }
+            { name: "Genres", value: `${content.genres.join(", ")}`, inline: true },
+
+            api.type === "sonarr"
+              ? { name: "Sonarr", value: `[Link](${api.base}/series/${content.titleSlug})`, inline: true }
+              : { name: "Radarr", value: `[Link](${api.base}/movie/${content.tmdbId})`, inline: true }
           )
           .setImage(poster)
           .setTimestamp()
