@@ -10,8 +10,19 @@ console.log(
   `https://discord.com/api/oauth2/authorize?client_id=${process.env.DC_CLIENT_ID}&permissions=2147485696&scope=bot`
 );
 
-if (!process.env.DC_TOKEN) {
-  console.log("Missing args");
+let missingEnvVars = [];
+if (!process.env.BOT_WHITELIST) missingEnvVars.push("BOT_WHITELIST");
+if (!process.env.BOT_MAX_CONTENT) missingEnvVars.push("BOT_MAX_CONTENT");
+if (!process.env.DC_TOKEN) missingEnvVars.push("DC_TOKEN");
+if (!process.env.DC_CLIENT_ID) missingEnvVars.push("DC_CLIENT_ID");
+if (!process.env.RADARR_URL) missingEnvVars.push("RADARR_URL");
+if (!process.env.RADARR_KEY) missingEnvVars.push("RADARR_KEY");
+if (!process.env.RADARR_MONITOR) missingEnvVars.push("RADARR_MONITOR");
+if (!process.env.SONARR_URL) missingEnvVars.push("SONARR_URL");
+if (!process.env.SONARR_KEY) missingEnvVars.push("SONARR_KEY");
+if (!process.env.SONARR_MONITOR) missingEnvVars.push("SONARR_MONITOR");
+if (missingEnvVars.length > 0) {
+  console.error(`Missing environment variables:\n- ${missingEnvVars.join("\n- ")}`);
   process.exit(1);
 }
 
