@@ -3,8 +3,8 @@ import path from "path";
 
 export default class API {
   public readonly type: "radarr" | "sonarr";
-  private base: string; // API base url
-  private key: string; // API key
+  public readonly base: string; // Radarr/Sonarr base url
+  private readonly key: string; // API key
 
   constructor(type: "radarr" | "sonarr") {
     this.type = type;
@@ -49,7 +49,7 @@ export default class API {
 
   public async search(term: string): Promise<any[]> {
     const res = await this.request("get", this.type === "radarr" ? "movie/lookup" : "series/lookup", { term: term });
-    console.log("search", term, res.status, res.config);
+    console.log("search", term, res);
     if (res.status === 200) {
       if (res.data.length <= 0) throw new APIError("Couldn't find any content from search.");
       return res.data;
@@ -116,7 +116,7 @@ export default class API {
     sp?: { [key: string]: string },
     data?: Object
   ): Promise<AxiosResponse<any, any>> {
-    const url = new URL(`${this.base}/${ep}`);
+    const url = new URL(`${this.base}/api/v3/${ep}`);
     url.searchParams.append("apikey", this.key);
     for (const k in sp) {
       url.searchParams.append(k, sp[k]);
