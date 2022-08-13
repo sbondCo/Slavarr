@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
 import path from "path";
 
 export default class API {
@@ -103,11 +103,25 @@ export default class API {
 
     console.log("add request:", reqData);
 
-    const res = await this.request("post", this.type === "radarr" ? "movie" : "series", undefined, reqData);
-    if (res.status === 201) {
-      return res.data;
+    try {
+      const res = await this.request("post", this.type === "radarr" ? "movie" : "series", undefined, reqData);
+      if (res.status === 201) {
+        return res.data;
+      }
+      throw new Error(`Error adding content on ${this.type}:` + res.status + res.data);
+    } catch (err) {
+      if (err instanceof AxiosError) {
+        if (err.response?.status === 400 && err.response?.data) {
+          let resData = err.response.data;
+          for (let i = 0, n = resData.length; i < n; i++) {
+            const errCode = resData[i].errorCode;
+            if (errCode == "MovieExistsValidator" || errCode == "SeriesExistsValidator") {
+              throw new APIError(`That ${this.type === "radarr" ? "movie" : "show"} is already on ${this.type}!`);
+            }
+          }
+        }
+      }
     }
-    throw new Error(`Error adding content on ${this.type}:` + res.status + res.data);
   }
 
   private async request(
