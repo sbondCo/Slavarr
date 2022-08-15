@@ -21,6 +21,7 @@ export async function listContent(api: API, interaction: ChatInputCommandInterac
     }
 
     const content = (await api.search(name)).splice(0, Number(process.env.BOT_MAX_CONTENT));
+    console.log("listContent: content", content);
     const options: Array<APISelectMenuOption> = [];
 
     if (!content || content.length <= 0) {
@@ -35,17 +36,30 @@ export async function listContent(api: API, interaction: ChatInputCommandInterac
       const k = Number(_k);
       const show = content[k];
       console.log("ratings", show.ratings);
+      if (show.added === "0001-01-01T00:01:00Z" || show.added === "0001-01-01T00:00:00Z") {
+        // Only add option to dropdown if not already added on radarr/sonarr
+        options.push({
+          label: show.title,
+          description: show.overview ? show.overview.slice(0, 100) : "Overview unavailable",
+          value: `${show.imdbId}`
+        });
+      } else {
+        show.title += " (added)";
+      }
       rows.push([show.title, show.year]);
-      options.push({
-        label: show.title,
-        description: show.overview ? show.overview.slice(0, 100) : "Overview unavailable",
-        value: `${show.imdbId}`
-      });
     }
 
     console.log("Select Options", options);
 
     const table = makeATable(rows);
+
+    if (options.length <= 0) {
+      interaction.reply({
+        content: `All content returned from your search has already been added on ${api.type}.`,
+        ephemeral: true
+      });
+      return;
+    }
 
     interaction.reply({
       content: "```CSS\n" + table + "\n```",
