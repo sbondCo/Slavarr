@@ -35,7 +35,6 @@ export async function listContent(api: API, interaction: ChatInputCommandInterac
     for (const _k in content) {
       const k = Number(_k);
       const show = content[k];
-      console.log("ratings", show.ratings);
       if (show.added === "0001-01-01T00:01:00Z" || show.added === "0001-01-01T00:00:00Z") {
         // Only add option to dropdown if not already added on radarr/sonarr
         options.push({
