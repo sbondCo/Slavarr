@@ -77,11 +77,6 @@ export default class API {
       qualityProfileId: Number(qualityId)
     };
 
-    console.log("radarr monitor", process.env.RADARR_MONITOR);
-    console.log("sonarr monitor", process.env.SONARR_MONITOR);
-
-    // return {} as any;
-
     if (this.type === "radarr") {
       const toMonitor = process.env.RADARR_MONITOR == "true" ? true : false;
       reqData.monitored = toMonitor;

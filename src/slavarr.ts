@@ -2,6 +2,8 @@ import { Client, Collection } from "discord.js";
 import "dotenv/config";
 import fs from "fs";
 import path from "path";
+import startWebhooker from "./hooker";
+import DB from "./db";
 import { stopAbuse } from "./lib/helpMe";
 
 console.log("Starting Slavarr");
@@ -44,6 +46,8 @@ for (const file of commandFiles) {
 
 client.once("ready", () => {
   console.log("Slavarr ready");
+  DB.init();
+  // startWebhooker();
 });
 
 client.on("interactionCreate", async (interaction) => {
