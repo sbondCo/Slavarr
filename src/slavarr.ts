@@ -52,22 +52,41 @@ client.once("ready", () => {
 
 client.on("interactionCreate", async (interaction) => {
   try {
+    if (!interaction.member?.user) {
+      if (interaction.isRepliable())
+        interaction.reply({ content: "Couldn't fetch your discord user.", ephemeral: true });
+      return;
+    }
+
     if (stopAbuse(interaction)) {
       console.log(
         "Non whitelisted user attempted to interact:",
-        interaction.member?.user?.username,
-        interaction.member?.user?.id
+        interaction.member.user.username,
+        interaction.member.user.id
       );
       if (interaction.isRepliable())
         interaction.reply({ content: "You must be whitelisted to use this function.", ephemeral: true });
       return;
     }
 
+    const user = DB.getUser(interaction.member.user.id);
+    console.log("User in DB:", user);
+
+    // interaction.user.send("This be a dm test").catch((err) => {
+    //   console.log("Error sending PM to user:", err);
+    //   if (interaction.isRepliable())
+    //     interaction.reply({
+    //       content:
+    //         "Failed to send you a PM!\nThis could be because of your `privacy settings`. Click the server banner then privacy settings and make sure that `Direct Messages` is `enabled`.",
+    //       ephemeral: true
+    //     });
+    // });
+
     console.log("isSelectMenu:", interaction.isSelectMenu());
     if (interaction.isChatInputCommand()) {
       const command = commands.get(interaction.commandName);
       if (!command) return;
-      await command.run(interaction);
+      await command.run(interaction, user);
     } else if (interaction.isSelectMenu() && interaction.customId) {
       const scid = interaction.customId.split(":");
       const command = commands.get(scid[0]);

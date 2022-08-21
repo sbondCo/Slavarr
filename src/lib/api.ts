@@ -15,7 +15,7 @@ export default class API {
   }
 
   public async getQualities() {
-    const res = await this.request("get", this.type === "radarr" ? "qualityprofile" : "profile");
+    const res = await this.request("get", "qualityprofile");
     if (res.status === 200) {
       return res.data;
     }

@@ -25,10 +25,10 @@ if (
 (async () => {
   console.log("Requesting quality profiles from Radarr and Sonarr.");
   const { data: radarrQualities } = await axios.get(
-    `${process.env.RADARR_URL}/qualityprofile/?apikey=${process.env.RADARR_KEY}`
+    `${process.env.RADARR_URL}/api/v3/qualityprofile/?apikey=${process.env.RADARR_KEY}`
   );
   const { data: sonarrQualities } = await axios.get(
-    `${process.env.SONARR_URL}/profile/?apikey=${process.env.SONARR_KEY}`
+    `${process.env.SONARR_URL}/api/v3/qualityprofile/?apikey=${process.env.SONARR_KEY}`
   );
   console.log("Done fetching quality profiles.");
 
@@ -65,6 +65,21 @@ if (
             })
           )
           .setRequired(true)
+      ),
+
+    // Settings
+    new SlashCommandBuilder()
+      .setName("set")
+      .setDescription("Modify your user settings")
+      .addSubcommand((sc) =>
+        sc
+          .setName("dm_instead")
+          .setDescription("If bot should DM you for notifications instead of pinging in channel you ran the command.")
+      )
+      .addSubcommand((sc) =>
+        sc
+          .setName("auto_subscribe")
+          .setDescription("If you want to auto subscribe to events on content you have added.")
       )
   ];
 
