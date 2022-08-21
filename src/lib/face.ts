@@ -35,6 +35,10 @@ export async function listContent(api: API, interaction: ChatInputCommandInterac
     for (const _k in content) {
       const k = Number(_k);
       const show = content[k];
+      if (!show.title || !show.imdbId) {
+        console.log("Show doesn't have a title or imdbId attached -> title:", show.title, "-> imdbId:", show.imdbId);
+        continue;
+      }
       if (show.added === "0001-01-01T00:01:00Z" || show.added === "0001-01-01T00:00:00Z") {
         // Only add option to dropdown if not already added on radarr/sonarr
         options.push({
