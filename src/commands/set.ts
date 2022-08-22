@@ -1,7 +1,7 @@
 import { ChatInputCommandInteraction } from "discord.js";
 import { User } from "src/types";
 
-export async function run(interaction: ChatInputCommandInteraction, user: User) {
+export async function run(user: User, interaction: ChatInputCommandInteraction) {
   const subCmd = interaction.options.getSubcommand();
   if (!subCmd) return;
 

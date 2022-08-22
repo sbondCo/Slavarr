@@ -1,5 +1,5 @@
 export interface User {
-  userId: number;
+  userId: string;
   settings: UserSettings;
 }
 
@@ -21,3 +21,9 @@ export const DefaultUserSettings: UserSettings = {
   dmInstead: false,
   autoSubscribe: true
 };
+
+export interface Event {
+  imdbId: string;
+  subscribers: string[];
+  channelId: string;
+}

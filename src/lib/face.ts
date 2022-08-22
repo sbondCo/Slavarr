@@ -6,6 +6,8 @@ import {
   SelectMenuBuilder,
   SelectMenuInteraction
 } from "discord.js";
+import DB from "./../db";
+import { User } from "./../types";
 import API, { APIError } from "./api";
 import { makeATable } from "./helpMe";
 
@@ -88,7 +90,7 @@ export async function listContent(api: API, interaction: ChatInputCommandInterac
   }
 }
 
-export async function addContent(api: API, interaction: SelectMenuInteraction, args: string[]) {
+export async function addContent(api: API, user: User, interaction: SelectMenuInteraction, args: string[]) {
   try {
     const { 0: qualityId } = args;
     const imdbId = interaction.values[0];
@@ -126,8 +128,20 @@ export async function addContent(api: API, interaction: SelectMenuInteraction, a
           .setFooter({ text: "Search started" })
       ],
       content: "",
+      // TODO: subscribe me button so others can also subscribe to movie download event
       components: [] // Empty arr to remove existing buttons
     });
+
+    if (user.settings.autoSubscribe) {
+      // subscribe the user
+      DB.createEvent(content.imdbId, interaction.channelId, user.userId);
+      interaction.reply({
+        content: `You have been automatically subscribed to this ${
+          api.type === "radarr" ? "movies" : "shows"
+        } download events. Toggle this behaviour with the \`/set auto_subscribe\` command.`,
+        ephemeral: true
+      });
+    }
   } catch (err) {
     interaction.message.edit({ components: [] });
 

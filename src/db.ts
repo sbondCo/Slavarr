@@ -1,6 +1,6 @@
 // https://techfort.github.io/LokiJS/
 import loki from "lokijs";
-import { DefaultUserSettings, User } from "./types";
+import { DefaultUserSettings, Event, User } from "./types";
 
 export default class DB {
   private static db?: LokiConstructor = undefined;
@@ -10,8 +10,15 @@ export default class DB {
   public static get users() {
     if (this._users) return this._users;
 
-    this._users = this.db!.addCollection("users");
+    this._users = this.db!.addCollection("users", { indices: ["userId"] });
     return this._users;
+  }
+
+  public static get events() {
+    if (this._events) return this._events;
+
+    this._events = this.db!.addCollection("events", { indices: ["imdbId"] });
+    return this._events;
   }
 
   public static init() {
@@ -26,8 +33,8 @@ export default class DB {
         this._events = this.db!.getCollection("events");
 
         // // Create collections if not exist.
-        if (this._users === null) this._users = this.db!.addCollection("users", { indices: ["userId", "settings"] });
-        if (this._events === null) this._events = this.db!.addCollection("events");
+        if (this._users === null) this._users = this.db!.addCollection("users", { indices: ["userId"] });
+        if (this._events === null) this._events = this.db!.addCollection("events", { indices: ["imdbId"] });
       },
       autosave: true,
       autosaveInterval: 4000
@@ -52,5 +59,26 @@ export default class DB {
       user.settings.autoSubscribe = DefaultUserSettings.autoSubscribe;
 
     return user as User;
+  }
+
+  public static getEvent(imdbId: string): Event | undefined {
+    return DB.events.findOne({ imdbId: imdbId });
+  }
+
+  public static createEvent(imdbId: string, channelId: string, initialSubscriberId?: string) {
+    console.log(`Creating event for ${imdbId}. Initial subscriber: ${initialSubscriberId}`);
+    // If event already exists, dont add it again, just return it (after adding new subscriber).
+    let event = DB.getEvent(imdbId);
+    if (event) {
+      console.log("Event already created.. not creating again.");
+      if (initialSubscriberId && !event.subscribers.includes(initialSubscriberId))
+        event.subscribers.push(initialSubscriberId);
+      return event;
+    }
+    return DB.events.insertOne({ imdbId: imdbId, channelId: channelId, subscribers: [initialSubscriberId] } as Event);
+  }
+
+  public static subscribeToEvent(imdbId: string, subscriberId: string | number) {
+    // TODO: get event, if not exist create, and add subscriberId to subscibers array.
   }
 }

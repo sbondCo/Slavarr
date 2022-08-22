@@ -1,4 +1,4 @@
-import { Client, Collection } from "discord.js";
+import { Client, Collection, MessageOptions, MessagePayload, TextChannel } from "discord.js";
 import "dotenv/config";
 import fs from "fs";
 import path from "path";
@@ -47,7 +47,7 @@ for (const file of commandFiles) {
 client.once("ready", () => {
   console.log("Slavarr ready");
   DB.init();
-  // startWebhooker();
+  startWebhooker();
 });
 
 client.on("interactionCreate", async (interaction) => {
@@ -86,12 +86,12 @@ client.on("interactionCreate", async (interaction) => {
     if (interaction.isChatInputCommand()) {
       const command = commands.get(interaction.commandName);
       if (!command) return;
-      await command.run(interaction, user);
+      await command.run(user, interaction);
     } else if (interaction.isSelectMenu() && interaction.customId) {
       const scid = interaction.customId.split(":");
       const command = commands.get(scid[0]);
       if (!command) return;
-      await command.button(interaction, scid.splice(1));
+      await command.button(user, interaction, scid.splice(1));
     } else {
       console.log("Unsupported interaction type encountered.");
     }
@@ -100,3 +100,11 @@ client.on("interactionCreate", async (interaction) => {
     // await interaction.reply({ content: "Error encountered performing request ;--(", ephemeral: true });
   }
 });
+
+export function sendMsgToChannel(channelId: string, msg: string | MessagePayload | MessageOptions) {
+  return (client.channels.cache.get(channelId) as TextChannel)?.send(msg);
+}
+
+export function sendDM(userId: string, msg: string | MessagePayload | MessageOptions) {
+  return client.users.cache.get(userId)?.send(msg);
+}
