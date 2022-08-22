@@ -7,18 +7,14 @@ export default class DB {
   private static _users?: Collection<any> = undefined;
   private static _events?: Collection<any> = undefined;
 
-  public static get users() {
+  private static get users() {
     if (this._users) return this._users;
-
-    this._users = this.db!.addCollection("users", { indices: ["userId"] });
-    return this._users;
+    throw new Error("DB.init() wasn't run or failed! Users collection not set.");
   }
 
-  public static get events() {
+  private static get events() {
     if (this._events) return this._events;
-
-    this._events = this.db!.addCollection("events", { indices: ["imdbId"] });
-    return this._events;
+    throw new Error("DB.init() wasn't run or failed! Events collection not set.");
   }
 
   public static init() {
