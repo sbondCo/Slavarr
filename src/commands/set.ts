@@ -33,6 +33,7 @@ export async function run(user: User, interaction: ChatInputCommandInteraction) 
     try {
       const btns = generateEventBtns(user.settings.events);
       interaction.reply({
+        content: "Click notification events below to enable/disable them.",
         components: [new ActionRowBuilder<ButtonBuilder>().addComponents(...btns)],
         ephemeral: true
       });
@@ -82,16 +83,19 @@ export async function button(user: User, interaction: ButtonInteraction, args: s
       // then finally .filtering (if user is removing event). Let us pray for speed.
       const evLenB4 = user.settings.events.length;
       const usrEventsFiltered = user.settings.events.filter((e) => e !== ev);
-
+      let msg;
       if (evLenB4 === usrEventsFiltered.length) {
         user.settings.events.push(ev);
+        msg = `You are now **subscribed** to **${ev}** notifications.`;
       } else {
         user.settings.events = usrEventsFiltered;
+        msg = `You have been **unsubscribed** from **${ev}** notifications.`;
       }
 
       const btns = generateEventBtns(user.settings.events);
       interaction
         .update({
+          content: msg,
           components: [new ActionRowBuilder<ButtonBuilder>().addComponents(...btns)]
         })
         .catch((err) => {
