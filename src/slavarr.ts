@@ -91,6 +91,11 @@ client.on("interactionCreate", async (interaction) => {
       const scid = interaction.customId.split(":");
       const command = commands.get(scid[0]);
       if (!command) return;
+      await command.selectMenu(user, interaction, scid.splice(1));
+    } else if (interaction.isButton() && interaction.customId) {
+      const scid = interaction.customId.split(":");
+      const command = commands.get(scid[0]);
+      if (!command) return;
       await command.button(user, interaction, scid.splice(1));
     } else {
       console.log("Unsupported interaction type encountered.");

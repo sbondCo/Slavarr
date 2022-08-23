@@ -9,6 +9,6 @@ export async function run(user: User, interaction: ChatInputCommandInteraction) 
   listContent(api, interaction);
 }
 
-export async function button(user: User, interaction: SelectMenuInteraction, args: string[]) {
+export async function selectMenu(user: User, interaction: SelectMenuInteraction, args: string[]) {
   addContent(api, user, interaction, args);
 }

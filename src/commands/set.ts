@@ -1,5 +1,11 @@
-import { ChatInputCommandInteraction } from "discord.js";
-import { User } from "src/types";
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonInteraction,
+  ButtonStyle,
+  ChatInputCommandInteraction
+} from "discord.js";
+import { EventType, User } from "../types";
 
 export async function run(user: User, interaction: ChatInputCommandInteraction) {
   const subCmd = interaction.options.getSubcommand();
@@ -23,12 +29,31 @@ export async function run(user: User, interaction: ChatInputCommandInteraction) 
     });
   };
 
+  const showEventsSelection = () => {
+    try {
+      const btns = generateEventBtns(user.settings.events);
+      interaction.reply({
+        components: [new ActionRowBuilder<ButtonBuilder>().addComponents(...btns)],
+        ephemeral: true
+      });
+    } catch (err) {
+      console.log("Errored whilst trying to show events selection to", user.userId, "-->", err);
+      interaction.reply({
+        content: "There was an issue trying to display the events selection menu. We sorri ;-(",
+        ephemeral: true
+      });
+    }
+  };
+
   switch (subCmd) {
     case "dm_instead":
       toggleDMInstead();
       break;
     case "auto_subscribe":
       toggleAutoSubscribe();
+      break;
+    case "events":
+      showEventsSelection();
       break;
     default:
       interaction.reply({
@@ -39,6 +64,66 @@ export async function run(user: User, interaction: ChatInputCommandInteraction) 
   }
 }
 
-// export async function button(interaction: SelectMenuInteraction, args: string[]) {
-//
-// }
+export async function button(user: User, interaction: ButtonInteraction, args: string[]) {
+  console.log("Set btn clicked", args);
+  if (!args[0] || !args[1]) {
+    console.log("Set btn reached without args at indexes 0 or 1 -->", args);
+    return;
+  }
+
+  let { 0: which, 1: data } = args;
+
+  const handleEventsBtn = () => {
+    try {
+      const ev = data as EventType;
+
+      // Checking if event is in users events this way because it avoids us
+      // needing to loop over the array twice, once checking with .includes,
+      // then finally .filtering (if user is removing event). Let us pray for speed.
+      const evLenB4 = user.settings.events.length;
+      const usrEventsFiltered = user.settings.events.filter((e) => e !== ev);
+
+      if (evLenB4 === usrEventsFiltered.length) {
+        user.settings.events.push(ev);
+      } else {
+        user.settings.events = usrEventsFiltered;
+      }
+
+      const btns = generateEventBtns(user.settings.events);
+      interaction
+        .update({
+          components: [new ActionRowBuilder<ButtonBuilder>().addComponents(...btns)]
+        })
+        .catch((err) => {
+          throw Error(err);
+        });
+
+      console.log("Users events:", user.settings.events);
+    } catch (err) {
+      console.log("Errored whilst typing to handle an events menu button:", err);
+      interaction.update({
+        content:
+          "Sorry MR SIR. There was an error trying to update this event on your account. Please contact my owner if I keep erroring."
+      });
+    }
+  };
+
+  switch (which) {
+    case "events":
+      handleEventsBtn();
+      break;
+  }
+}
+
+function generateEventBtns(usersEvents: EventType[]) {
+  let btns = [];
+  for (const [key, value] of Object.entries(EventType)) {
+    btns.push(
+      new ButtonBuilder()
+        .setCustomId(`set:events:${value}`)
+        .setLabel(key)
+        .setStyle(usersEvents.includes(value) ? ButtonStyle.Primary : ButtonStyle.Secondary)
+    );
+  }
+  return btns;
+}

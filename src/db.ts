@@ -53,6 +53,8 @@ export default class DB {
       user.settings.dmInstead = DefaultUserSettings.dmInstead;
     if (user.settings.autoSubscribe === undefined || user.settings.autoSubscribe === null)
       user.settings.autoSubscribe = DefaultUserSettings.autoSubscribe;
+    if (user.settings.events === undefined || user.settings.events === null)
+      user.settings.events = DefaultUserSettings.events;
 
     return user as User;
   }

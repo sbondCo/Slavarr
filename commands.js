@@ -81,6 +81,9 @@ if (
           .setName("auto_subscribe")
           .setDescription("If you want to auto subscribe to events on content you have added.")
       )
+      .addSubcommand((sc) =>
+        sc.setName("events").setDescription("Manage content events that you want to be subscribed to.")
+      )
   ];
 
   const rest = new REST({ version: "10" }).setToken(process.env.DC_TOKEN);
