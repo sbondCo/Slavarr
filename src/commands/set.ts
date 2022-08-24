@@ -5,6 +5,7 @@ import {
   ButtonStyle,
   ChatInputCommandInteraction
 } from "discord.js";
+import DB from "../db";
 import { EventType, User } from "../types";
 
 export async function run(user: User, interaction: ChatInputCommandInteraction) {
@@ -14,6 +15,7 @@ export async function run(user: User, interaction: ChatInputCommandInteraction) 
   const toggleDMInstead = () => {
     if (user.settings.dmInstead) user.settings.dmInstead = false;
     else user.settings.dmInstead = true;
+    DB.updateUser(user);
     interaction.reply({
       content: `DM Instead (of ping in channel) ${user.settings.dmInstead ? "enabled" : "disabled"}`,
       ephemeral: true
@@ -23,6 +25,7 @@ export async function run(user: User, interaction: ChatInputCommandInteraction) 
   const toggleAutoSubscribe = () => {
     if (user.settings.autoSubscribe) user.settings.autoSubscribe = false;
     else user.settings.autoSubscribe = true;
+    DB.updateUser(user);
     interaction.reply({
       content: `Auto Subscribe ${user.settings.autoSubscribe ? "enabled" : "disabled"}`,
       ephemeral: true
@@ -91,6 +94,7 @@ export async function button(user: User, interaction: ButtonInteraction, args: s
         user.settings.events = usrEventsFiltered;
         msg = `You have been **unsubscribed** from **${ev}** notifications.`;
       }
+      DB.updateUser(user);
 
       const btns = generateEventBtns(user.settings.events);
       interaction

@@ -33,8 +33,20 @@ export default class DB {
         if (this._events === null) this._events = this.db!.addCollection("events", { indices: ["imdbId"] });
       },
       autosave: true,
-      autosaveInterval: 4000
+      autosaveInterval: 2000
     });
+
+    this.db.on("error", (errDoc) => {
+      console.log("DB Error on document:", errDoc);
+    });
+  }
+
+  /**
+   * Call this with the modified user obj after making changes you want to apply to the DB.
+   * @param newUser The modified user object with changes you want to apply.
+   */
+  public static updateUser(user: User) {
+    DB.users.update(user);
   }
 
   public static getUser(id: string | number): User {
@@ -48,13 +60,7 @@ export default class DB {
     }
 
     // Ensure settings data on user
-    if (!user.settings) user.settings = { dmInstead: DefaultUserSettings.dmInstead };
-    if (user.settings.dmInstead === undefined || user.settings.dmInstead === null)
-      user.settings.dmInstead = DefaultUserSettings.dmInstead;
-    if (user.settings.autoSubscribe === undefined || user.settings.autoSubscribe === null)
-      user.settings.autoSubscribe = DefaultUserSettings.autoSubscribe;
-    if (user.settings.events === undefined || user.settings.events === null)
-      user.settings.events = DefaultUserSettings.events;
+    DB.addMissingUserSettings(user);
 
     return user as User;
   }
@@ -78,5 +84,33 @@ export default class DB {
 
   public static subscribeToEvent(imdbId: string, subscriberId: string | number) {
     // TODO: get event, if not exist create, and add subscriberId to subscibers array.
+  }
+
+  /**
+   * Check users settings and add missing ones.
+   * When we add settings, this will ensure all users have the new ones.
+   * @param user
+   */
+  private static addMissingUserSettings(user: User) {
+    let update = false;
+
+    if (!user.settings) {
+      user.settings = DefaultUserSettings;
+      update = true;
+    }
+    if (user.settings.dmInstead === undefined || user.settings.dmInstead === null) {
+      user.settings.dmInstead = DefaultUserSettings.dmInstead;
+      update = true;
+    }
+    if (user.settings.autoSubscribe === undefined || user.settings.autoSubscribe === null) {
+      user.settings.autoSubscribe = DefaultUserSettings.autoSubscribe;
+      update = true;
+    }
+    if (!user.settings.events) {
+      user.settings.events = DefaultUserSettings.events;
+      update = true;
+    }
+
+    if (update) DB.users.update(user);
   }
 }
