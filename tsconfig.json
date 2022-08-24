@@ -17,6 +17,6 @@
     "sourceMap": false,
     "baseUrl": "./"
   },
-  "include": ["./**/*.ts"],
+  "include": ["./src/**/*.ts"],
   "exclude": ["node_modules", "out"]
 }
