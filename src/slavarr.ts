@@ -70,19 +70,7 @@ client.on("interactionCreate", async (interaction) => {
     }
 
     const user = DB.getUser(interaction.member.user.id);
-    console.log("User in DB:", user);
 
-    // interaction.user.send("This be a dm test").catch((err) => {
-    //   console.log("Error sending PM to user:", err);
-    //   if (interaction.isRepliable())
-    //     interaction.reply({
-    //       content:
-    //         "Failed to send you a PM!\nThis could be because of your `privacy settings`. Click the server banner then privacy settings and make sure that `Direct Messages` is `enabled`.",
-    //       ephemeral: true
-    //     });
-    // });
-
-    console.log("isSelectMenu:", interaction.isSelectMenu());
     if (interaction.isChatInputCommand()) {
       const command = commands.get(interaction.commandName);
       if (!command) return;
@@ -102,7 +90,8 @@ client.on("interactionCreate", async (interaction) => {
     }
   } catch (error) {
     console.error(error);
-    // await interaction.reply({ content: "Error encountered performing request ;--(", ephemeral: true });
+    if (interaction.isRepliable())
+      await interaction.reply({ content: "Error encountered performing request ;--(", ephemeral: true });
   }
 });
 

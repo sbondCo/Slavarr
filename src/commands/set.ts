@@ -12,10 +12,29 @@ export async function run(user: User, interaction: ChatInputCommandInteraction) 
   const subCmd = interaction.options.getSubcommand();
   if (!subCmd) return;
 
-  const toggleDMInstead = () => {
-    if (user.settings.dmInstead) user.settings.dmInstead = false;
-    else user.settings.dmInstead = true;
-    DB.updateUser(user);
+  const toggleDMInstead = async () => {
+    if (user.settings.dmInstead) {
+      user.settings.dmInstead = false;
+      DB.updateUser(user);
+    } else {
+      // User set dmInstead to true.. test if we can PM them before updating their setting
+      try {
+        await interaction.user.send("You will now be notified here for content updates!"); // TODO: could be an embed to look nicer
+      } catch (err) {
+        console.log("User tried to update `dmInstead` to true, but test DM failed! Reverting change.:", err);
+        user.settings.dmInstead = false;
+        if (interaction.isRepliable())
+          interaction.reply({
+            content:
+              "**dmInstead was not changed:** Failed to send you a test PM!\nThis could be because of your `privacy settings`. Click the server banner then privacy settings and make sure that `Direct Messages` is `enabled`.",
+            ephemeral: true
+          });
+      } finally {
+        user.settings.dmInstead = true;
+        DB.updateUser(user);
+      }
+    }
+
     interaction.reply({
       content: `DM Instead (of ping in channel) ${user.settings.dmInstead ? "enabled" : "disabled"}`,
       ephemeral: true
