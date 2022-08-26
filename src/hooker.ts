@@ -18,38 +18,58 @@ export default function startWebhooker() {
   // TODO: two diff routes for movies/series
   // OR check the request host and match to radarr/sonarr urls set in env?
   app.post("/", (req, res) => {
-    console.log("WEBHOOK:", req.body);
+    try {
+      console.log("Webhook payload:", req.body);
 
-    // Get required content details first.
-    let imdbId, title;
+      if (!req.body.eventType) {
+        let err = "Webhook payload doesn't contain `eventType`, ignoring.";
+        console.error(err);
+        res.status(400).send(err);
+        return;
+      }
 
-    if (req.body.movie) {
-      imdbId = req.body.movie.imdbId;
-      title = req.body.movie.title;
-    } else if (req.body.series) {
-      // TODO Series will need to be handled differently? because there is possibly an event fired for each episode if fetched individually
-      imdbId = req.body.series.imdbId;
-      title = req.body.series.title;
+      // Get required content details first.
+      let type: "radarr" | "sonarr", content;
+
+      if (req.body.movie) {
+        type = "radarr";
+        content = req.body.movie;
+      } else if (req.body.series) {
+        // TODO Series will need to be handled differently? because there is possibly an event fired for each episode if fetched individually
+        type = "sonarr";
+        content = req.body.series;
+      }
+
+      if (!content || !content.imdbId || !content.title) {
+        // TODO this error msg probably makes no sense
+        let err = "Payload doesn't include all required fields (movie|series).(imdbId,title).";
+        console.error(err);
+        res.status(400).send(err);
+        return;
+      }
+
+      let msg: string | undefined = undefined;
+      switch (req.body.eventType.toLowerCase()) {
+        case "import":
+          msg = "was imported!";
+          break;
+        case "grab":
+          msg = "was grabbed!";
+          break;
+        case "moviedelete":
+          msg = "was removed from Radarr.";
+          break;
+        case "seriesdelete":
+          msg = "was removed from Sonarr.";
+          break;
+      }
+      if (msg) notify(content.imdbId, `\`${content.title}${content.year ? ` (${content.year})` : ""}\` ${msg}`);
+
+      res.status(200).send();
+    } catch (err) {
+      console.error("Error occurred handling webhook payload:", err);
+      res.status(500).send("Error occurred handling webhook payload. For more info please check the server log.");
     }
-
-    if (!imdbId) {
-      console.error("Couldn't get imdbId from webhook data, ignoring.");
-      res.status(400).send();
-      return;
-    }
-
-    console.log("WebHook: Event Type:", req.body.eventType);
-    switch (req.body.eventType?.toLowerCase()) {
-      case "grab":
-        notify(imdbId);
-        break;
-      case "moviedelete":
-        // TODO: also wahtever the case is for series
-        notify(imdbId);
-        break;
-    }
-
-    res.status(200).send();
   });
 }
 
