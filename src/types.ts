@@ -23,8 +23,10 @@ export interface UserSettings {
 }
 
 export enum EventType {
-  Grab = "GRAB",
-  Import = "IMPORT"
+  Grab = "Grab",
+  Import = "Import",
+  MovieDelete = "MovieDelete",
+  SeriesDelete = "SeriesDelete"
 }
 
 export interface Event {

@@ -7,6 +7,7 @@
 import express from "express";
 import DB from "./db";
 import { sendDM, sendMsgToChannel } from "./slavarr";
+import { EventType } from "./types";
 
 export default function startWebhooker() {
   console.log("Webhook listener starting...");
@@ -48,22 +49,24 @@ export default function startWebhooker() {
         return;
       }
 
+      let eventType = req.body.eventType as EventType;
       let msg: string | undefined = undefined;
-      switch (req.body.eventType.toLowerCase()) {
-        case "import":
+      switch (eventType) {
+        case EventType.Import:
           msg = "was imported!";
           break;
-        case "grab":
+        case EventType.Grab:
           msg = "was grabbed!";
           break;
-        case "moviedelete":
+        case EventType.MovieDelete:
           msg = "was removed from Radarr.";
           break;
-        case "seriesdelete":
+        case EventType.SeriesDelete:
           msg = "was removed from Sonarr.";
           break;
       }
-      if (msg) notify(content.imdbId, `\`${content.title}${content.year ? ` (${content.year})` : ""}\` ${msg}`);
+      if (msg)
+        notify(content.imdbId, eventType, `\`${content.title}${content.year ? ` (${content.year})` : ""}\` ${msg}`);
 
       res.status(200).send();
     } catch (err) {
@@ -73,7 +76,7 @@ export default function startWebhooker() {
   });
 }
 
-function notify(imdbId: string, msg: string) {
+function notify(imdbId: string, eventType: EventType, msg: string) {
   console.log("hooker notify() called");
   const event = DB.getEvent(imdbId);
   if (!event) {
@@ -91,6 +94,9 @@ function notify(imdbId: string, msg: string) {
       console.log("Couldn't find subscribers user in DB:", subId, ". Can't notify them.");
       return;
     }
+    // Skip user if they aren't subscribed to this event type.
+    if (!sub.settings.events.includes(eventType)) return;
+    // Send DM or add user to channelSubs for processing in one msg if wanted in channel
     if (sub.settings.dmInstead) {
       sendDM(sub.userId, msg);
     } else {
