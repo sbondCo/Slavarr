@@ -73,7 +73,7 @@ export default function startWebhooker() {
   });
 }
 
-function notify(imdbId: string) {
+function notify(imdbId: string, msg: string) {
   console.log("hooker notify() called");
   const event = DB.getEvent(imdbId);
   if (!event) {
@@ -84,6 +84,7 @@ function notify(imdbId: string) {
   console.log("Event fetched:", event);
   // const subscribers = event?.subscribers
 
+  const channelSubs = Array<string>();
   event?.subscribers.forEach((subId) => {
     const sub = DB.getUser(subId);
     if (!sub) {
@@ -91,10 +92,10 @@ function notify(imdbId: string) {
       return;
     }
     if (sub.settings.dmInstead) {
-      sendDM(sub.userId, "Some event happened my brother");
+      sendDM(sub.userId, msg);
     } else {
-      // TODO: don't send a channel msg for each user, add them to array and ping them all in one msg
-      sendMsgToChannel(event.channelId, "Some event happened my brother");
+      channelSubs.push(`<@${sub.userId}>`);
     }
   });
+  if (channelSubs.length > 0) sendMsgToChannel(event.channelId, `${msg} ${channelSubs.join(" ")}`);
 }
