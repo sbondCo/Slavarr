@@ -77,31 +77,35 @@ export default function startWebhooker() {
 }
 
 function notify(imdbId: string, eventType: EventType, msg: string) {
-  console.log("hooker notify() called");
-  const event = DB.getEvent(imdbId);
-  if (!event) {
-    console.log("No event in DB matching imdbId:", imdbId, ". Ignoring..");
-    return;
-  }
-
-  console.log("Event fetched:", event);
-  // const subscribers = event?.subscribers
-
-  const channelSubs = Array<string>();
-  event?.subscribers.forEach((subId) => {
-    const sub = DB.getUser(subId);
-    if (!sub) {
-      console.log("Couldn't find subscribers user in DB:", subId, ". Can't notify them.");
+  try {
+    console.log("hooker notify() called");
+    const event = DB.getEvent(imdbId);
+    if (!event) {
+      console.log("No event in DB matching imdbId:", imdbId, ". Ignoring..");
       return;
     }
-    // Skip user if they aren't subscribed to this event type.
-    if (!sub.settings.events.includes(eventType)) return;
-    // Send DM or add user to channelSubs for processing in one msg if wanted in channel
-    if (sub.settings.dmInstead) {
-      sendDM(sub.userId, msg);
-    } else {
-      channelSubs.push(`<@${sub.userId}>`);
-    }
-  });
-  if (channelSubs.length > 0) sendMsgToChannel(event.channelId, `${msg} ${channelSubs.join(" ")}`);
+
+    console.log("Event fetched:", event);
+    // const subscribers = event?.subscribers
+
+    const channelSubs = Array<string>();
+    event?.subscribers.forEach((subId) => {
+      const sub = DB.getUser(subId);
+      if (!sub) {
+        console.log("Couldn't find subscribers user in DB:", subId, ". Can't notify them.");
+        return;
+      }
+      // Skip user if they aren't subscribed to this event type.
+      if (!sub.settings.events.includes(eventType)) return;
+      // Send DM or add user to channelSubs for processing in one msg if wanted in channel
+      if (sub.settings.dmInstead) {
+        sendDM(sub.userId, msg);
+      } else {
+        channelSubs.push(`<@${sub.userId}>`);
+      }
+    });
+    if (channelSubs.length > 0) sendMsgToChannel(event.channelId, `${msg} ${channelSubs.join(" ")}`);
+  } catch (err) {
+    console.error("hooker.notify() failed:", err);
+  }
 }

@@ -138,7 +138,7 @@ export async function addContent(api: API, user: User, interaction: SelectMenuIn
       interaction.reply({
         content: `You have been automatically subscribed to this ${
           api.type === "radarr" ? "movies" : "shows"
-        } download events. Toggle this behaviour with the \`/set auto_subscribe\` command.`,
+        } download events. Toggle this behaviour with the \`/set auto_subscribe\` command. Use \`/set events\` to configure the events you subscribe to.`,
         ephemeral: true
       });
     }
