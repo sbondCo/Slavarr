@@ -67,7 +67,7 @@ export async function listContent(api: API, interaction: ChatInputCommandInterac
     }
 
     interaction.reply({
-      content: "```CSS\n" + table + "\n```",
+      content: "```\n" + table + "\n```",
       components: [
         new ActionRowBuilder<SelectMenuBuilder>().addComponents(
           new SelectMenuBuilder()
