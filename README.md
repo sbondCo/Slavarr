@@ -25,8 +25,7 @@ The Discord bot to help you easily add movies/series to Radarr/Sonarr.
      - [Docker Compose (my favourite)](#docker-compose)
      - [Docker](#docker-cli)
      - [From Source](#from-source)
-5. Invite the bot to a server
-   After starting the bot, you should see an Invite URL logged to the console for you to use.
+5. Invite the bot to a server (an invite url is logged to console for you when slavarr starts).
 6. Optionally add notification support:
    1. In Sonarr and Radarr go to Settings > Connect > + (Add Notification) > Webhook.
    2. Set a Name for the connection
