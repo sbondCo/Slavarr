@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   slavarr:
-    image: ghcr.io/irhm/slavarr:latest
+    image: ghcr.io/sbondCo/slavarr:latest
     container_name: slavarr
     env_file:
       - .env
