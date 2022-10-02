@@ -6,4 +6,8 @@ services:
     container_name: slavarr
     env_file:
       - .env
+    ports:
+      - 3001:3001
+    volumes:
+      - ./data:/app/data
     restart: unless-stopped

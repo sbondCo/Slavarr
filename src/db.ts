@@ -20,7 +20,7 @@ export default class DB {
   public static init() {
     if (this.db) return;
 
-    this.db = new loki("slavarr.db", {
+    this.db = new loki("./data/slavarr.db", {
       autoload: true,
       autoloadCallback: () => {
         // For storing users.

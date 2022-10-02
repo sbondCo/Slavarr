@@ -25,27 +25,33 @@ RUN [ "npm", "run", "build" ]
 # Run stage
 FROM node:16 as runner
 
-RUN set -x \
-    # Add user
-    && addgroup --gid 10001 app \
-    && adduser --disabled-password \
-        --gecos '' \
-        --gid 10001 \
-        --home /app \
-        --uid 10001 \
-        app
+# Cant get data volume to work properly when using app user
 
-USER app
+# RUN set -x \
+#     # Add user
+#     && addgroup --gid 10001 app \
+#     && adduser --disabled-password \
+#         --gecos '' \
+#         --gid 10001 \
+#         --home /app \
+#         --uid 10001 \
+#         app
+
+# USER app
 
 # Create app dir
 WORKDIR /app
 
 # Copy files needed in this stage from builder
-COPY --chown=app:app --from=builder ["/build/package.json", "/build/package-lock.json", "./"]
+COPY --from=builder ["/build/package.json", "/build/package-lock.json", "./"]
 
 RUN npm ci --only=production
 
 # Doesn't work when included in copy above...
-COPY --chown=app:app --from=builder /build/out ./out
+COPY --from=builder /build/out ./out
+
+VOLUME /app/data
+
+EXPOSE 3001
 
 CMD [ "npm", "run", "start" ]
