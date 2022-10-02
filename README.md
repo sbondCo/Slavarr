@@ -47,7 +47,7 @@ The Discord bot to help you easily add movies/series to Radarr/Sonarr.
 
 1. Start the bot:
    ```
-   docker run -d --name=slavarr --env-file .env --restart unless-stopped ghcr.io/sbondCo/slavarr:latest
+   docker run -d --name=slavarr --env-file .env --restart unless-stopped ghcr.io/sbondco/slavarr:latest
    ```
 
 #### From Source
