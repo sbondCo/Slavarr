@@ -1,4 +1,4 @@
-import { Client, Collection, MessageOptions, MessagePayload, TextChannel } from "discord.js";
+import { Client, Collection, MessagePayload, TextChannel, MessageCreateOptions } from "discord.js";
 import "dotenv/config";
 import fs from "fs";
 import path from "path";
@@ -95,10 +95,10 @@ client.on("interactionCreate", async (interaction) => {
   }
 });
 
-export function sendMsgToChannel(channelId: string, msg: string | MessagePayload | MessageOptions) {
+export function sendMsgToChannel(channelId: string, msg: string | MessagePayload | MessageCreateOptions) {
   return (client.channels.cache.get(channelId) as TextChannel)?.send(msg);
 }
 
-export function sendDM(userId: string, msg: string | MessagePayload | MessageOptions) {
+export function sendDM(userId: string, msg: string | MessagePayload | MessageCreateOptions) {
   return client.users.cache.get(userId)?.send(msg);
 }
