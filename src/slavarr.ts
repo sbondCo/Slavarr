@@ -95,6 +95,18 @@ client.on("interactionCreate", async (interaction) => {
   }
 });
 
+process.on("SIGINT", () => {
+  DB.close((err) => {
+    if (err) {
+      console.error("Failed to close database", err);
+      process.exit(1);
+    } else {
+      console.log("Database closed");
+      process.exit(0);
+    }
+  });
+})
+
 export function sendMsgToChannel(channelId: string, msg: string | MessagePayload | MessageCreateOptions) {
   return (client.channels.cache.get(channelId) as TextChannel)?.send(msg);
 }

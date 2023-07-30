@@ -57,6 +57,14 @@ export default class DB {
     });
   }
 
+  public static close(cb: (err?: any) => void) {
+    if (!this.db) {
+      console.log("Can't close db, db not open.")
+    }
+    console.log("Closing database.");
+    this.db?.close(cb);
+  }
+
   /**
    * Call this with the modified user obj after making changes you want to apply to the DB.
    * @param newUser The modified user object with changes you want to apply.
