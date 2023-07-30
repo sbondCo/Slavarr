@@ -1,6 +1,8 @@
 // https://techfort.github.io/LokiJS/
 import loki from "lokijs";
 import { DefaultUserSettings, Event, User } from "./types";
+import path from "path";
+import fs from "fs";
 
 export default class DB {
   private static db?: LokiConstructor = undefined;
@@ -19,8 +21,20 @@ export default class DB {
 
   public static init() {
     if (this.db) return;
+    const dbPath = path.resolve("./data/slavarr.db");
+    console.log("Initializing database at", dbPath);
 
-    this.db = new loki("./data/slavarr.db", {
+    try {
+      fs.mkdirSync("./data");
+    } catch (err: any) {
+      if (err?.code === "EEXIST") {
+        console.log("DB data dir exists!");
+        return;
+      }
+      console.error("Failed to create db data dir", err);
+    }
+
+    this.db = new loki(dbPath, {
       autoload: true,
       autoloadCallback: () => {
         // For storing users.
@@ -28,7 +42,7 @@ export default class DB {
         // Store the events that users subscribe to for specific content.
         this._events = this.db!.getCollection("events");
 
-        // // Create collections if not exist.
+        // Create collections if not exist.
         if (this._users === null) this._users = this.db!.addCollection("users", { indices: ["userId"] });
         if (this._events === null) this._events = this.db!.addCollection("events", { indices: ["imdbId"] });
       },
@@ -37,7 +51,7 @@ export default class DB {
     });
 
     this.db.on("error", (errDoc) => {
-      console.log("DB Error on document:", errDoc);
+      console.error("DB Error on document:", errDoc);
     });
   }
 
