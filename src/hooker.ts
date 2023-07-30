@@ -29,6 +29,13 @@ export default function startWebhooker() {
         return;
       }
 
+      // 204 test events and do nothing else
+      // so that success is shown in radarr/sonarr ui when testing webhook.
+      if (req.body.eventType?.toLowerCase() === "test") {
+        res.status(204).send();
+        return;
+      }
+
       // Get required content details first.
       let type: "radarr" | "sonarr", content;
 
