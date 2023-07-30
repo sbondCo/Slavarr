@@ -2,6 +2,8 @@ out/
 .env*
 !.env.example
 *.db
+dev/*
+!dev/docker-compose.yml
 
 # Logs
 logs

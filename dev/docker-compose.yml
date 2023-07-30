@@ -1,0 +1,44 @@
+version: "3.9"
+
+# To test prod
+services:
+  slavarr:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: slavarr
+    env_file:
+      - .env
+    ports:
+      - 3001:3001
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+
+  radarr:
+    container_name: radarr
+    image: linuxserver/radarr
+    ports:
+      - 7878:7878
+    volumes:
+      - ./radarr:/config
+      - ./movies:/movies
+      - ./downloads:/downloads
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+
+  sonarr:
+    container_name: sonarr
+    image: linuxserver/sonarr
+    ports:
+      - 8989:8989
+    volumes:
+      - ./sonarr:/config
+      - ./series:/series
+      - ./downloads:/downloads
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
