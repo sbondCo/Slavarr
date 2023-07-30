@@ -29,9 +29,10 @@ export default class DB {
     } catch (err: any) {
       if (err?.code === "EEXIST") {
         console.log("DB data dir exists!");
+      } else {
+        console.error("Failed to create db data dir", err);
         return;
       }
-      console.error("Failed to create db data dir", err);
     }
 
     this.db = new loki(dbPath, {
@@ -45,6 +46,7 @@ export default class DB {
         // Create collections if not exist.
         if (this._users === null) this._users = this.db!.addCollection("users", { indices: ["userId"] });
         if (this._events === null) this._events = this.db!.addCollection("events", { indices: ["imdbId"] });
+        console.log("Database initialized!");
       },
       autosave: true,
       autosaveInterval: 2000
