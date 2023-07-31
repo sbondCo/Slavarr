@@ -25,8 +25,9 @@ export interface UserSettings {
 export enum EventType {
   Grab = "Grab",
   Import = "Import",
+  Download = "Download",
   MovieDelete = "MovieDelete",
-  SeriesDelete = "SeriesDelete"
+  SeriesDelete = "SeriesDelete",
 }
 
 export interface Event {
@@ -42,5 +43,5 @@ export interface Event {
 export const DefaultUserSettings: UserSettings = {
   dmInstead: false,
   autoSubscribe: true,
-  events: [EventType.Grab, EventType.Import]
+  events: [EventType.Grab, EventType.Import, EventType.Download],
 };

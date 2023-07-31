@@ -50,7 +50,8 @@ export default function startWebhooker() {
 
       if (!content || !content.imdbId || !content.title) {
         // TODO this error msg probably makes no sense
-        let err = "Payload doesn't include all required fields (movie|series).(imdbId,title).";
+        let err =
+          "Payload doesn't include all required fields (movie|series).(imdbId,title).";
         console.error(err);
         res.status(400).send(err);
         return;
@@ -65,6 +66,9 @@ export default function startWebhooker() {
         case EventType.Grab:
           msg = "was grabbed!";
           break;
+        case EventType.Download:
+          msg = "was downloaded!";
+          break;
         case EventType.MovieDelete:
           msg = "was removed from Radarr.";
           break;
@@ -73,12 +77,22 @@ export default function startWebhooker() {
           break;
       }
       if (msg)
-        notify(content.imdbId, eventType, `\`${content.title}${content.year ? ` (${content.year})` : ""}\` ${msg}`);
+        notify(
+          content.imdbId,
+          eventType,
+          `\`${content.title}${
+            content.year ? ` (${content.year})` : ""
+          }\` ${msg}`
+        );
 
       res.status(200).send();
     } catch (err) {
       console.error("Error occurred handling webhook payload:", err);
-      res.status(500).send("Error occurred handling webhook payload. For more info please check the server log.");
+      res
+        .status(500)
+        .send(
+          "Error occurred handling webhook payload. For more info please check the server log."
+        );
     }
   });
 }
@@ -99,7 +113,11 @@ function notify(imdbId: string, eventType: EventType, msg: string) {
     event?.subscribers.forEach((subId) => {
       const sub = DB.getUser(subId);
       if (!sub) {
-        console.log("Couldn't find subscribers user in DB:", subId, ". Can't notify them.");
+        console.log(
+          "Couldn't find subscribers user in DB:",
+          subId,
+          ". Can't notify them."
+        );
         return;
       }
       // Skip user if they aren't subscribed to this event type.
@@ -111,7 +129,8 @@ function notify(imdbId: string, eventType: EventType, msg: string) {
         channelSubs.push(`<@${sub.userId}>`);
       }
     });
-    if (channelSubs.length > 0) sendMsgToChannel(event.channelId, `${msg} ${channelSubs.join(" ")}`);
+    if (channelSubs.length > 0)
+      sendMsgToChannel(event.channelId, `${msg} ${channelSubs.join(" ")}`);
   } catch (err) {
     console.error("hooker.notify() failed:", err);
   }
