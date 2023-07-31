@@ -13,7 +13,7 @@ import DB from "./db";
 import { stopAbuse } from "./lib/helpMe";
 import initCommands from "./commands";
 
-console.log("Starting Slavarr");
+console.log(`Starting Slavarr v${process.env.npm_package_version}`);
 console.log(
   "Invite URL:",
   `https://discord.com/api/oauth2/authorize?client_id=${process.env.DC_CLIENT_ID}&permissions=2147485696&scope=bot`
