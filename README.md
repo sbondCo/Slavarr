@@ -24,7 +24,7 @@ The Discord bot to help you easily add movies/series to Radarr/Sonarr.
    2. Set a Name for the connection
    3. Add the URL to Slavarrs listener (default: `http://127.0.0.1:3001`)
    4. Click `Save` and you are done, Slavarr will receive events and notify you of them!
-6. :cheer: Done! When slavarr starts, it will register the bots slash commands and you should be ready to use it!
+6. 🥳 Done! When slavarr starts, it will register the bots slash commands and you should be ready to use it!
 
 ### Installation
 
