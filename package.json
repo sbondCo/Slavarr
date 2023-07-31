@@ -5,7 +5,6 @@
   "main": "index.js",
   "scripts": {
     "start:dev": "tsc && node out/slavarr.js",
-    "commands": "node commands.js",
     "build": "tsc",
     "start": "node out/slavarr.js",
     "test": "jest",

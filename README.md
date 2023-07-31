@@ -14,23 +14,17 @@ The Discord bot to help you easily add movies/series to Radarr/Sonarr.
 2. Fill out the environment variables
    1. [Download the .env.example file](https://raw.githubusercontent.com/sbondCo/Slavarr/master/.env.example) from the repo.
    2. Copy the `.env.example` files contents into a new file `.env` and fill out all the environment variables listed. All variables have a comment above them so you know what to set them as.
-3. Register the bots slash commands
-   1. [Download the latest commands.js script](https://raw.githubusercontent.com/sbondCo/Slavarr/master/commands.js) from the repo.
-   2. Run the script to register your bots slash commands:
-      ```
-      # You can also run `npm run commands` if you have the package.json file.
-      node commands.js
-      ```
-4. Choose the way you want to setup the bot:
-     - [Docker Compose (my favourite)](#docker-compose)
-     - [Docker](#docker-cli)
-     - [From Source](#from-source)
-5. Invite the bot to a server (an invite url is logged to console for you when slavarr starts).
-6. Optionally add notification support:
+3. Choose the way you want to setup the bot:
+   - [Docker Compose (my favourite)](#docker-compose)
+   - [Docker](#docker-cli)
+   - [From Source](#from-source)
+4. Invite the bot to a server (an invite url is logged to console for you when slavarr starts).
+5. Optionally add notification support:
    1. In Sonarr and Radarr go to Settings > Connect > + (Add Notification) > Webhook.
    2. Set a Name for the connection
    3. Add the URL to Slavarrs listener (default: `http://127.0.0.1:3001`)
    4. Click `Save` and you are done, Slavarr will receive events and notify you of them!
+6. :cheer: Done! When slavarr starts, it will register the bots slash commands and you should be ready to use it!
 
 ### Installation
 
@@ -59,8 +53,6 @@ The Discord bot to help you easily add movies/series to Radarr/Sonarr.
    npm i
    # Build slavarr
    npm run build
-   # Register the bots commands with discord
-   npm run commands
    ```
 3. Start the bot:
    ```
