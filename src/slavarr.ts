@@ -1,10 +1,17 @@
-import { Client, Collection, MessagePayload, TextChannel, MessageCreateOptions } from "discord.js";
+import {
+  Client,
+  Collection,
+  MessagePayload,
+  TextChannel,
+  MessageCreateOptions,
+} from "discord.js";
 import "dotenv/config";
 import fs from "fs";
 import path from "path";
 import startWebhooker from "./hooker";
 import DB from "./db";
 import { stopAbuse } from "./lib/helpMe";
+import initCommands from "./commands";
 
 console.log("Starting Slavarr");
 console.log(
@@ -24,24 +31,33 @@ if (!process.env.SONARR_URL) missingEnvVars.push("SONARR_URL");
 if (!process.env.SONARR_KEY) missingEnvVars.push("SONARR_KEY");
 if (!process.env.SONARR_MONITOR) missingEnvVars.push("SONARR_MONITOR");
 if (missingEnvVars.length > 0) {
-  console.error(`Missing environment variables:\n- ${missingEnvVars.join("\n- ")}`);
+  console.error(
+    `Missing environment variables:\n- ${missingEnvVars.join("\n- ")}`
+  );
   process.exit(1);
 }
 
+initCommands();
+
 const client = new Client({
-  intents: ["Guilds", "GuildMessages"]
+  intents: ["Guilds", "GuildMessages"],
 });
 
 client.login(process.env.DC_TOKEN);
 
 const commands = new Collection<string, any>();
 const commandsPath = path.join(__dirname, "commands");
-const commandFiles = fs.readdirSync(commandsPath).filter((file) => file.endsWith(".js"));
+const commandFiles = fs
+  .readdirSync(commandsPath)
+  .filter((file) => file.endsWith(".js"));
 
 for (const file of commandFiles) {
   const filePath = path.join(commandsPath, file);
   const command = require(filePath);
-  commands.set(path.basename(filePath).replace(path.extname(filePath), ""), command);
+  commands.set(
+    path.basename(filePath).replace(path.extname(filePath), ""),
+    command
+  );
 }
 
 client.once("ready", () => {
@@ -54,7 +70,10 @@ client.on("interactionCreate", async (interaction) => {
   try {
     if (!interaction.member?.user) {
       if (interaction.isRepliable())
-        interaction.reply({ content: "Couldn't fetch your discord user.", ephemeral: true });
+        interaction.reply({
+          content: "Couldn't fetch your discord user.",
+          ephemeral: true,
+        });
       return;
     }
 
@@ -65,7 +84,10 @@ client.on("interactionCreate", async (interaction) => {
         interaction.member.user.id
       );
       if (interaction.isRepliable())
-        interaction.reply({ content: "You must be whitelisted to use this function.", ephemeral: true });
+        interaction.reply({
+          content: "You must be whitelisted to use this function.",
+          ephemeral: true,
+        });
       return;
     }
 
@@ -91,7 +113,10 @@ client.on("interactionCreate", async (interaction) => {
   } catch (error) {
     console.error(error);
     if (interaction.isRepliable())
-      await interaction.reply({ content: "Error encountered performing request ;--(", ephemeral: true });
+      await interaction.reply({
+        content: "Error encountered performing request ;--(",
+        ephemeral: true,
+      });
   }
 });
 
@@ -105,12 +130,18 @@ process.on("SIGINT", () => {
       process.exit(0);
     }
   });
-})
+});
 
-export function sendMsgToChannel(channelId: string, msg: string | MessagePayload | MessageCreateOptions) {
+export function sendMsgToChannel(
+  channelId: string,
+  msg: string | MessagePayload | MessageCreateOptions
+) {
   return (client.channels.cache.get(channelId) as TextChannel)?.send(msg);
 }
 
-export function sendDM(userId: string, msg: string | MessagePayload | MessageCreateOptions) {
+export function sendDM(
+  userId: string,
+  msg: string | MessagePayload | MessageCreateOptions
+) {
   return client.users.cache.get(userId)?.send(msg);
 }
